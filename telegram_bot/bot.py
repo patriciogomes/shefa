@@ -1,7 +1,7 @@
 
 import os
-import telegram
-from telegram.ext import Updater, CommandHandler
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")  # Optional: restrict bot to a single user/chat
@@ -9,7 +9,9 @@ CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")  # Optional: restrict bot to a single us
 if not TELEGRAM_TOKEN:
     raise ValueError("TELEGRAM_BOT_TOKEN must be set in environment variables.")
 
-bot = telegram.Bot(token=TELEGRAM_TOKEN)
+updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
+dispatcher = updater.dispatcher
+bot = updater.bot
 
 def send_message(message):
     if CHAT_ID:
@@ -17,14 +19,32 @@ def send_message(message):
     else:
         raise ValueError("CHAT_ID not set. Please set TELEGRAM_CHAT_ID in environment.")
 
-def start(update, context):
+# --- Bot Commands ---
+
+def start(update: Update, context: CallbackContext):
     context.bot.send_message(chat_id=update.effective_chat.id, text="🤖 Shefa Bot is online and ready!")
 
-def setup_bot_commands():
-    updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
-    dispatcher = updater.dispatcher
+def status(update: Update, context: CallbackContext):
+    # Placeholder status report
+    context.bot.send_message(chat_id=update.effective_chat.id, text="📊 Shefa Engine is running smoothly.")
 
-    dispatcher.add_handler(CommandHandler('start', start))
+def stop(update: Update, context: CallbackContext):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="🛑 Stop command received. (Manual override needed)")
+
+def help_command(update: Update, context: CallbackContext):
+    help_text = (
+        "/start - Start the Shefa bot\n"
+        "/status - Show current bot status\n"
+        "/stop - Stop the engine\n"
+        "/help - Show this command list"
+    )
+    context.bot.send_message(chat_id=update.effective_chat.id, text=help_text)
+
+def setup_bot_commands():
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("status", status))
+    dispatcher.add_handler(CommandHandler("stop", stop))
+    dispatcher.add_handler(CommandHandler("help", help_command))
 
     updater.start_polling()
     print("Telegram bot is running...")

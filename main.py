@@ -1,12 +1,10 @@
-
-import os
 import time
 import json
 
 from binance.market_data import get_latest_price, get_klines, calculate_volatility
 from openai.decision import get_trade_signal
 from engine.alpha import calculate_allocation
-from telegram_bot.bot import send_message
+from backup.bot import send_message
 
 SYMBOL = "ETHUSDT"
 INTERVAL = "1m"
