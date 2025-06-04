@@ -1,0 +1,31 @@
+
+import os
+import telegram
+from telegram.ext import Updater, CommandHandler
+
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")  # Optional: restrict bot to a single user/chat
+
+if not TELEGRAM_TOKEN:
+    raise ValueError("TELEGRAM_BOT_TOKEN must be set in environment variables.")
+
+bot = telegram.Bot(token=TELEGRAM_TOKEN)
+
+def send_message(message):
+    if CHAT_ID:
+        bot.send_message(chat_id=CHAT_ID, text=message)
+    else:
+        raise ValueError("CHAT_ID not set. Please set TELEGRAM_CHAT_ID in environment.")
+
+def start(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="🤖 Shefa Bot is online and ready!")
+
+def setup_bot_commands():
+    updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
+    dispatcher = updater.dispatcher
+
+    dispatcher.add_handler(CommandHandler('start', start))
+
+    updater.start_polling()
+    print("Telegram bot is running...")
+    return updater
