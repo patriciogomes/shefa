@@ -1,4 +1,11 @@
 python-binance
-openai
-python-telegram-bot==13.15
-pandas
+openai~=1.84.0
+python-telegram-bot~=22.1
+pandas~=2.2.3
+pip~=24.2
+attrs~=25.3.0
+distro~=1.9.0
+protobuf~=5.29.4
+cryptography~=44.0.2
+Booktype~=1.5
+binance~=0.3.48
