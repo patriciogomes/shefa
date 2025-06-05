@@ -1,18 +1,11 @@
-
 import os
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
+import telebot
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-
 if not TELEGRAM_TOKEN:
     raise ValueError("TELEGRAM_BOT_TOKEN must be set in environment variables.")
 
-updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
-dispatcher = updater.dispatcher
-bot = updater.bot
-
-# Armazena IDs de usuários ativos
+bot = telebot.TeleBot(TELEGRAM_TOKEN)
 ACTIVE_USERS = set()
 
 def send_message(message):
@@ -21,41 +14,34 @@ def send_message(message):
         return
     for chat_id in ACTIVE_USERS:
         try:
-            bot.send_message(chat_id=chat_id, text=message)
+            bot.send_message(chat_id, message)
         except Exception as e:
-            print(f"Failed to send message to {chat_id}: {str(e)}")
+            print(f"Error sending to {chat_id}: {str(e)}")
 
-# --- Bot Commands ---
-
-def start(update: Update, context: CallbackContext):
-    chat_id = update.effective_chat.id
+@bot.message_handler(commands=['start'])
+def start_handler(message):
+    chat_id = message.chat.id
     ACTIVE_USERS.add(chat_id)
-    context.bot.send_message(chat_id=chat_id, text="🤖 Shefa Bot is online and ready for you!")
+    bot.send_message(chat_id, "🤖 Shefa Bot is online and ready!")
 
-def status(update: Update, context: CallbackContext):
-    chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id=chat_id, text="📊 Shefa Engine is running smoothly.")
+@bot.message_handler(commands=['status'])
+def status_handler(message):
+    bot.send_message(message.chat.id, "📊 Shefa Engine is running.")
 
-def stop(update: Update, context: CallbackContext):
-    chat_id = update.effective_chat.id
-    context.bot.send_message(chat_id=chat_id, text="🛑 Stop command received. (Manual override needed)")
+@bot.message_handler(commands=['stop'])
+def stop_handler(message):
+    bot.send_message(message.chat.id, "🛑 Stop command received (manual override needed).")
 
-def help_command(update: Update, context: CallbackContext):
-    chat_id = update.effective_chat.id
+@bot.message_handler(commands=['help'])
+def help_handler(message):
     help_text = (
         "/start - Start the Shefa bot\n"
         "/status - Show current bot status\n"
         "/stop - Stop the engine\n"
         "/help - Show this command list"
     )
-    context.bot.send_message(chat_id=chat_id, text=help_text)
+    bot.send_message(message.chat.id, help_text)
 
 def setup_bot_commands():
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("status", status))
-    dispatcher.add_handler(CommandHandler("stop", stop))
-    dispatcher.add_handler(CommandHandler("help", help_command))
-
-    updater.start_polling()
-    print("Telegram bot is running...")
-    return updater
+    print("✅ Telebot bot is polling...")
+    bot.polling()

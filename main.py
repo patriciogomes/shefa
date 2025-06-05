@@ -4,7 +4,8 @@ import json
 from binance_api.market_data import get_latest_price, get_klines, calculate_volatility
 from openai.decision import get_trade_signal
 from engine.alpha import calculate_allocation
-from backup.bot import send_message
+from telegram_bot.bot import send_message, setup_bot_commands
+
 
 SYMBOL = "ETHUSDT"
 INTERVAL = "1m"
@@ -62,5 +63,12 @@ def run_shefa():
 
         time.sleep(LOOP_INTERVAL)
 
+
+
+
 if __name__ == "__main__":
+    setup_bot_commands()  # Inicia o polling
+    send_message("🤖 Shefa Bot iniciou com sucesso.")
     run_shefa()
+
+
