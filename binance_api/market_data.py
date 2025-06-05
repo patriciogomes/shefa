@@ -1,5 +1,5 @@
 
-from client import create_binance_client
+from binance_api.binance_client import create_binance_client
 import pandas as pd
 
 client = create_binance_client()

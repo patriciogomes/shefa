@@ -1,5 +1,5 @@
 
-from client import create_binance_client
+from binance_client import create_binance_client
 
 client = create_binance_client()
 

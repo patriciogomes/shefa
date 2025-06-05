@@ -1,5 +1,6 @@
 import os
-from binance.client import Client  # <-- Correto
+
+from binance.client import Client
 
 def create_binance_client():
     api_key = os.getenv("BINANCE_API_KEY")
