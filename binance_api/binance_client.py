@@ -1,6 +1,7 @@
 import ccxt
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 def create_binance_client():
@@ -13,7 +14,10 @@ def create_binance_client():
     binance = ccxt.binance({
         'apiKey': api_key,
         'secret': api_secret,
-        'enableRateLimit': True
+        'enableRateLimit': True,
+        'options': {
+            'adjustForTimeDifference': True  # 🔧 Corrige problema de timestamp
+        }
     })
 
     return binance

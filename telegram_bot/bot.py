@@ -10,8 +10,9 @@ ACTIVE_USERS = set()
 
 def send_message(message):
     if not ACTIVE_USERS:
-        print("No active users to send message to.")
+        print("⚠️ No active users to send message to.")
         return
+    print("📤 Enviando mensagem para:", ACTIVE_USERS)
     for chat_id in ACTIVE_USERS:
         try:
             bot.send_message(chat_id, message)
@@ -22,6 +23,7 @@ def send_message(message):
 def start_handler(message):
     chat_id = message.chat.id
     ACTIVE_USERS.add(chat_id)
+    print(f"✅ Usuário {chat_id} registrado com /start")
     bot.send_message(chat_id, "🤖 Shefa Bot is online and ready!")
 
 @bot.message_handler(commands=['status'])
@@ -44,4 +46,4 @@ def help_handler(message):
 
 def setup_bot_commands():
     print("✅ Telebot bot is polling...")
-    bot.polling()
+    bot.polling(none_stop=True, timeout=60)
