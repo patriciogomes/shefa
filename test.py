@@ -1,12 +1,14 @@
-import asyncio
-from telegram import Bot
+import ccxt
+import os
+exchange = ccxt.binance({
+    "enableRateLimit": True,
+    "options": {
+        "adjustForTimeDifference": True
+    }
+})
 
-async def get_chat_id():
-    bot = Bot(token="7752436641:AAH-aJ_B6trDn12a1NjOyh09m6k5JQ1NEiM")
-    updates = await bot.get_updates()
-    for u in updates:
-        print("Chat ID:", u.message.chat.id)
-
-asyncio.run(get_chat_id())
+exchange.load_markets()
+print("✅ Conexão com Binance está OK e ajustada.")
 
 
+print(os.getenv("BINANCE_API_KEY"))

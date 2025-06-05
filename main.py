@@ -1,10 +1,12 @@
 import time
 import json
-
+import threading
+from dotenv import load_dotenv
+load_dotenv()
 from binance_api.market_data import get_latest_price, get_klines, calculate_volatility
 from openai.decision import get_trade_signal
 from engine.alpha import calculate_allocation
-from telegram_bot.bot import send_message, setup_bot_commands
+from telegram_bot.bot import send_message, setup_bot_commands, ACTIVE_USERS
 
 SYMBOL = "ETH/USDT"
 INTERVAL = "1m"
@@ -13,6 +15,10 @@ LOOP_INTERVAL = 60  # seconds between executions
 def run_shefa():
     send_message("🤖 Shefa Alpha Engine started.")
     print("🟢 Shefa Engine loop running...")
+
+    while not ACTIVE_USERS:
+        print("⏳ Aguardando /start no Telegram para iniciar...")
+        time.sleep(2)
 
     while True:
         try:
@@ -74,6 +80,6 @@ def run_shefa():
         time.sleep(LOOP_INTERVAL)
 
 if __name__ == "__main__":
-    setup_bot_commands()
-    send_message("🤖 Shefa Bot iniciou com sucesso.")
+    threading.Thread(target=setup_bot_commands, daemon=True).start()
+    send_message("🤖 Shefa Bot iniciado com sucesso.")
     run_shefa()
