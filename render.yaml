@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: shefa-alpha-engine
+    name: shefa
     env: python
     plan: free
     buildCommand: ""
