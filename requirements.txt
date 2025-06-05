@@ -1,4 +1,4 @@
-pandas~=2.2.3
-python-telegram-bot~=22.1
-pip~=24.2
-binance~=0.3.48
+python-binance
+openai
+python-telegram-bot==13.15
+pandas

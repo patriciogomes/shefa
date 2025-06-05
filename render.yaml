@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: shefa-alpha-engine
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: bash start.sh
+    autoDeploy: true
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: BINANCE_API_KEY
+        sync: false
+      - key: BINANCE_API_SECRET
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
