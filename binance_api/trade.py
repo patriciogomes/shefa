@@ -3,7 +3,7 @@ from binance_client import create_binance_client
 
 client = create_binance_client()
 
-def place_market_order(symbol="BTCUSDT", side="BUY", quantity=0.001):
+def place_market_order(symbol="ETHUSDT", side="BUY", quantity=0.001):
     '''
     Place a market order (BUY or SELL) on Binance Futures.
     '''
@@ -18,7 +18,7 @@ def place_market_order(symbol="BTCUSDT", side="BUY", quantity=0.001):
     except Exception as e:
         return {"error": str(e)}
 
-def close_position(symbol="BTCUSDT"):
+def close_position(symbol="ETHUSDT"):
     '''
     Attempts to close an open position by placing a market order in the opposite direction.
     '''

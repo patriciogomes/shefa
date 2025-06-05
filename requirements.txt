@@ -2,6 +2,8 @@ python-binance
 openai~=1.84.0
 python-telegram-bot~=22.1
 pandas~=2.2.3
+pycryptodome
+
 pip~=24.2
 attrs~=25.3.0
 distro~=1.9.0
