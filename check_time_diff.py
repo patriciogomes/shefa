@@ -1,14 +1,8 @@
-import ccxt
-from dotenv import load_dotenv
-import os
+from ai import OpenAI
 
-load_dotenv()
-
-client = ccxt.binance({
-    'apiKey': os.getenv("BINANCE_API_KEY"),
-    'secret': os.getenv("BINANCE_SECRET_KEY"),
-    'enableRateLimit': True
-})
-
-balance = client.fetch_balance()
-print(balance)
+client = OpenAI(api_key="sua_api_key")
+resp = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[{"role": "user", "content": "Hello, what is the market sentiment?"}]
+)
+print(resp.choices[0].message.content)

@@ -4,7 +4,7 @@ import threading
 from dotenv import load_dotenv
 load_dotenv()
 from binance_api.market_data import get_latest_price, get_klines, calculate_volatility
-from openai.decision import get_trade_signal
+from ai.decision import get_trade_signal
 from engine.alpha import calculate_allocation
 from telegram_bot.bot import send_message, setup_bot_commands, ACTIVE_USERS
 
