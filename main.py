@@ -1,8 +1,7 @@
 import time
 import json
 import threading
-from dotenv import load_dotenv
-load_dotenv()
+
 from binance_api.market_data import get_latest_price, get_klines, calculate_volatility
 from ai.decision import get_trade_signal
 from engine.alpha import calculate_allocation
@@ -11,6 +10,14 @@ from telegram_bot.bot import send_message, setup_bot_commands, ACTIVE_USERS
 SYMBOL = "ETH/USDT"
 INTERVAL = "1m"
 LOOP_INTERVAL = 60  # seconds between executions
+
+def explain_direction(direction):
+    if direction.lower() == "long":
+        return "📈 Long (comprar esperando alta)"
+    elif direction.lower() == "short":
+        return "📉 Short (vender esperando queda)"
+    else:
+        return "🧘 No Trade (sem ação recomendada)"
 
 def run_shefa():
     send_message("🤖 Shefa Alpha Engine started.")
@@ -62,7 +69,7 @@ def run_shefa():
 
             msg = (
                 f"📊 Market: {SYMBOL}\n"
-                f"🧠 AI Direction: {direction}\n"
+                f"🧠 AI Direction: {explain_direction(direction)}\n"
                 f"📈 Expected Return (R_t): {R_t}\n"
                 f"⚠️ Risk (L_t): {L_t}\n"
                 f"🎯 Allocation (A_t): {A_t:.4f}\n"
