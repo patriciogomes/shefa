@@ -1,13 +1,14 @@
 import time
 import json
 import threading
+import math
 
 from binance_api.market_data import get_latest_price, get_klines, calculate_volatility
 from ai.decision import get_trade_signal
 from engine.alpha import calculate_allocation
 from telegram_bot.bot import send_message, setup_bot_commands, ACTIVE_USERS
 
-SYMBOL = "ETH/USDT"
+SYMBOL = "BTCUSDT"
 INTERVAL = "1m"
 LOOP_INTERVAL = 60  # seconds between executions
 
@@ -66,13 +67,14 @@ def run_shefa():
             confidence = float(signal.get("Confidence", 0.5))
 
             A_t = calculate_allocation(R_t, sentiment_score, technical_trend, volatility, L_t)
+            A_t = max(min(A_t, 1.0), -1.0)  # Limita a alocação entre -1 e +1
 
             msg = (
                 f"📊 Market: {SYMBOL}\n"
                 f"🧠 AI Direction: {explain_direction(direction)}\n"
-                f"📈 Expected Return (R_t): {R_t}\n"
-                f"⚠️ Risk (L_t): {L_t}\n"
-                f"🎯 Allocation (A_t): {A_t:.4f}\n"
+                f"📈 Expected Return (R_t): {R_t * 100:.2f}%\n"
+                f"⚠️ Risk (L_t): {L_t * 100:.2f}%\n"
+                f"🎯 Allocation (A_t): {A_t * 100:.2f}%\n"
                 f"✅ Confidence: {confidence}"
             )
 
