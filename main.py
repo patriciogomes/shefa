@@ -8,7 +8,7 @@ from ai.decision import get_trade_signal
 from engine.alpha import calculate_allocation
 from telegram_bot.bot import send_message, setup_bot_commands, ACTIVE_USERS
 
-SYMBOL = "BTCUSDT"
+SYMBOL = "ETHUSDT"
 INTERVAL = "1m"
 LOOP_INTERVAL = 60  # seconds between executions
 
