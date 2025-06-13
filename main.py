@@ -1,16 +1,21 @@
+
 import time
 import json
 import threading
 import math
+
 from binance_api.market_data import get_latest_price, get_klines, calculate_volatility
 from ai.decision import get_trade_signal
-from engine.alpha import calculate_allocation
-from engine.filters_detailed import is_valid_signal
+from engine.filters import is_valid_signal
 from telegram_bot.bot import send_message, setup_bot_commands, ACTIVE_USERS
 
 SYMBOL = "RESOLVUSDT"
 INTERVAL = "1m"
-LOOP_INTERVAL = 20  # seconds between executions
+LOOP_INTERVAL = 20
+
+capital = 48.00
+total_pnl = 0
+trade_history = []
 
 def explain_direction(direction):
     if direction.lower() == "long":
@@ -21,6 +26,8 @@ def explain_direction(direction):
         return "🧘 No Trade (sem ação recomendada)"
 
 def run_shefa():
+    global total_pnl
+
     send_message("🤖 Shefa Alpha Engine started.")
     print("🟢 Shefa Engine loop running...")
 
@@ -35,7 +42,7 @@ def run_shefa():
             candles = get_klines(SYMBOL, interval=INTERVAL, limit=50)
             volatility = calculate_volatility(candles)
             technical_trend = (candles["close"].iloc[-1] - candles["close"].iloc[0]) / candles["close"].iloc[0]
-            sentiment_score = 0  # placeholder
+            sentiment_score = 0
             market_summary = f"Current price: {price}, Volatility: {volatility:.4f}, Trend: {technical_trend:.4f}"
 
             print("🧠 Calling AI decision engine...")
@@ -66,6 +73,13 @@ def run_shefa():
             direction = signal.get("Direction", "No Trade")
             confidence = float(signal.get("Confidence", 0.5))
 
+            if confidence < 0.85 or abs(R_t) < 0.01:
+                msg = f"⛔ Sinal ignorado (baixa confiança {confidence:.2f} ou retorno {R_t:.4f})"
+                print(msg)
+                send_message(msg)
+                time.sleep(LOOP_INTERVAL)
+                continue
+
             if not is_valid_signal(R_t, L_t, sentiment_score, technical_trend, confidence, volatility):
                 msg = "⛔ Sinal bloqueado pelo filtro antifake-sinal (sinal fraco, incoerente ou arriscado)"
                 print(msg)
@@ -73,16 +87,22 @@ def run_shefa():
                 time.sleep(LOOP_INTERVAL)
                 continue
 
-            A_t = calculate_allocation(R_t, sentiment_score, technical_trend, volatility, L_t, confidence)
-            A_t = max(min(A_t, 1.0), -1.0)  # Limita a alocação entre -1 e +1
+            # Alocação
+            A_t = R_t / (volatility + L_t + 1e-6)
+            A_t = max(min(A_t, 1.0), -1.0)
+            expected_gain = capital * A_t * R_t
+            total_pnl += expected_gain
+            trade_history.append(expected_gain)
 
             msg = (
-                f"📊 Market: {SYMBOL}\n"
-                f"🧠 AI Direction: {explain_direction(direction)}\n"
-                f"📈 Expected Return (R_t): {R_t * 100:.2f}%\n"
-                f"⚠️ Risk (L_t): {L_t * 100:.2f}%\n"
-                f"🎯 Allocation (A_t): {A_t * 100:.2f}%\n"
-                f"✅ Confidence: {confidence}"
+                f"📊 Market: {SYMBOL}"
+                f"🧠 AI Direction: {explain_direction(direction)}"
+                f"📈 Expected Return (R_t): {R_t * 100:.2f}%"
+                f"⚠️ Risk (L_t): {L_t * 100:.2f}%"
+                f"🎯 Allocation (A_t): {A_t * 100:.2f}%"
+                f"💸 Gain Estimado: ${expected_gain:.2f}"
+                f"📊 PnL Total: ${total_pnl:.2f}"
+                f"✅ Confidence: {confidence:.2f}"
             )
 
             print("📤 Sending report...")
