@@ -4,7 +4,8 @@ import threading
 import math
 from binance_api.market_data import get_latest_price, get_klines, calculate_volatility
 from ai.decision import get_trade_signal
-from engine.filters import is_valid_signal
+from engine.alpha import calculate_allocation
+from engine.filters_detailed import is_valid_signal
 from telegram_bot.bot import send_message, setup_bot_commands, ACTIVE_USERS
 
 SYMBOL = "RESOLVUSDT"
