@@ -2,15 +2,14 @@ import time
 import json
 import threading
 import math
-
 from binance_api.market_data import get_latest_price, get_klines, calculate_volatility
 from ai.decision import get_trade_signal
-from engine.alpha import calculate_allocation
+from engine.filters import is_valid_signal
 from telegram_bot.bot import send_message, setup_bot_commands, ACTIVE_USERS
 
 SYMBOL = "RESOLVUSDT"
 INTERVAL = "1m"
-LOOP_INTERVAL = 60  # seconds between executions
+LOOP_INTERVAL = 20  # seconds between executions
 
 def explain_direction(direction):
     if direction.lower() == "long":
@@ -66,7 +65,14 @@ def run_shefa():
             direction = signal.get("Direction", "No Trade")
             confidence = float(signal.get("Confidence", 0.5))
 
-            A_t = calculate_allocation(R_t, sentiment_score, technical_trend, volatility, L_t)
+            if not is_valid_signal(R_t, L_t, sentiment_score, technical_trend, confidence, volatility):
+                msg = "⛔ Sinal bloqueado pelo filtro antifake-sinal (sinal fraco, incoerente ou arriscado)"
+                print(msg)
+                send_message(msg)
+                time.sleep(LOOP_INTERVAL)
+                continue
+
+            A_t = calculate_allocation(R_t, sentiment_score, technical_trend, volatility, L_t, confidence)
             A_t = max(min(A_t, 1.0), -1.0)  # Limita a alocação entre -1 e +1
 
             msg = (
