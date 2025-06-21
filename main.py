@@ -9,7 +9,7 @@ from ai.decision import get_trade_signal
 from engine.filters import is_valid_signal
 from telegram_bot.bot import send_message, setup_bot_commands, ACTIVE_USERS
 
-SYMBOL = "RESOLVUSDT"
+SYMBOL = "ETHUSDT"
 INTERVAL = "1m"
 LOOP_INTERVAL = 20
 
@@ -73,7 +73,10 @@ def run_shefa():
             direction = signal.get("Direction", "No Trade")
             confidence = float(signal.get("Confidence", 0.5))
 
-            if confidence < 0.85 or abs(R_t) < 0.01:
+
+            """
+
+            if confidence <= 0.75 or abs(R_t) < 0.01:
                 msg = f"⛔ Sinal ignorado (baixa confiança {confidence:.2f} ou retorno {R_t:.4f})"
                 print(msg)
                 send_message(msg)
@@ -86,6 +89,7 @@ def run_shefa():
                 send_message(msg)
                 time.sleep(LOOP_INTERVAL)
                 continue
+            """
 
             # Alocação
             A_t = R_t / (volatility + L_t + 1e-6)
